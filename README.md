@@ -6,8 +6,11 @@ The first argument is parsed to a Two's Complement integer using the "atoi" form
 The second argument tells the program what to do with the converted value. Here are the following options.
 
 "1": Convert the value to its One's Complement value.
+
 "s": Convert the argument to its Signed Magnitude value.
+
 "g": Convert the argument to its Gray Code value.
+
 "d": Convert the argument to its Double Dabble value.
 
 The final value is then displayed.
