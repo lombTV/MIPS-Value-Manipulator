@@ -48,9 +48,9 @@
 .end_macro
 
 # Macro for printing a String Argument
-.macro print_str (%str)
+.macro print_str ($str)
 	li $v0, 4
-	la $a0, %str
+	la $a0, $str
 	syscall
 .end_macro
 
@@ -189,6 +189,8 @@ nextPart:
 	li $v0, 34
 	lw $a0, sum
 	syscall
+	
+	j part2
 part2:
 	print_strarg("\n")
 # INSERT PART 2 HERE!
@@ -206,24 +208,83 @@ part2:
 	# Else, jump to error.
 	jal argError
 onesComplement:
-	print_strarg("Jumped to One's Complement!")
+	# Check if negative
+	lw $t0, arg1
+	lb $t1, 0($t0)
+	beq $t1, '-', onesNegative
+	
+	# Print Result
+	li $v0, 4
+	la $a0, one
+	syscall
+	
+	li $v0, 34
+	lw $a0, sum
+	syscall
+	
+	jal exit
+onesNegative:
+	# Subtract 1 from arg1 and display
+	lw $t0, sum
+	subi $t0, $t0, 1
+	sw $t0, sum
+	# Print Result
+	li $v0, 4
+	la $a0, one
+	syscall
+	
+	li $v0, 34
+	lw $a0, sum
+	syscall
+	
 	jal exit
 signedMagnitude:
-	print_strarg("Jumped to Signed Magnitude!")
+	lw $t0, arg1			
+	lb $t1, 0($t0)			
+	beq $t1, '-', signedNegative
+	print_str(sm)
+	print_strarg(" ")
+	li $v0, 34
+	lw $a0, sum
+	syscall
+	jal exit
+signedNegative:
+	# Formula for translating a negative value to Signed Magntiude
+	lw $t0, sum
+	li $t2, 0xFFFFFFFF
+	sub $t0, $t2, $t0
+	addi $t0, $t0, 1
+	addi $t0, $t0, 0x80000000
+	sw $t0, sum
+
+	# Print the Value
+	print_str(sm)
+	print_strarg(" ")
+	li $v0, 34
+	lw $a0, sum
+	syscall
 	jal exit
 graysCode:
-	print_strarg("Jumped to Gray's Code!")
+	lw $t0, sum
+	lb $t1, 0($t0)
+	# Formula for Gray's Code
+	move $t1, $t0
+	srl $t1, $t1, 1		#$t1 = sum >> 1
+	xor $t0, $t0, $t1	#t0 = sum ^ (sum >> 1)
+	sw $t0, sum
+	
+	print_str(gray)
+	print_strarg(" ")
+	li $v0, 34
+	lw $a0, sum
+	syscall
 	jal exit
+	
+	
 argError:
 	li $v0, 4
 	la $a0, error
 	syscall
-	
-	
-	
-	
-	
-
 exit:
 	exit_program ()
 getArgSize:
